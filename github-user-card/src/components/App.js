@@ -1,40 +1,43 @@
-// import React from 'react';
-// import axios from 'axios';
-// import UserDisplay from './UserCard'
-// import Form from './UsernameForm'
-// import './App.css';
+import React from "react";
+import axios from "axios";
+import UserCard from "./UserCard";
+import Followers from "./FollowersList";
 
-// class App extends React.Component {
-//   state = {
-//     user: {},
-//   }
+import "./App.css";
 
-//   // load in me (lehmannic) when app mounts
-//   componentDidMount() {
-//     axios.get("https://api.github.com/users/lehmannic")
-//       .then(res => {
-//         this.setState({
-//           user: res.data
-//         })
-//       })
-//   }
+class App extends React.Component {
+  state = {
+    user: {},
+    userFollowers: [],
+  };
 
-//   viewUser
-//   render(){
-//     return (
-//       <div className="App">
-//         <header className="App-header container">
-//           <h1>GitHub User Card App</h1>
-//           <Form />
-//         </header>
-//         <div className="user-details container">
-//           {/* UserList component that renders all users */}
-//           <UserDisplay />
-//         </div>
-//       </div>
-//     );
-//   }
+  // Fetch User Data
+  componentDidMount() {
+    axios
+      .all([
+        axios.get("https://api.github.com/users/lehmannic"),
+        // using Dominick Bruno's followers because I have none :(
+        axios.get("https://api.github.com/users/dombruno/followers"),
+      ])
+      .then(
+        axios.spread((userRes, followersRes) => {
+          this.setState({
+            user: userRes.data,
+            userFollowers: followersRes.data,
+          });
+        })
+      );
+  }
 
-// }
+  render() {
+    return (
+      <div className="App">
+        <h1>Github User Card App</h1>
+        <UserCard user={this.state.user} />
+        <Followers followers={this.state.userFollowers} />
+      </div>
+    );
+  }
+}
 
-// export default App;
+export default App;
